@@ -22,7 +22,8 @@ RUN apt-get update && \
     	code-aster-gui \
     	code-aster-run \
     	code-aster-test \
-    	libpetsc3.6 && \
+    	libpetsc3.6 \
+      hdf5-tools && \
     echo "@codeaster-gui" >> $DOCKER_HOME/.config/lxsession/LXDE/autostar && \
     rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
