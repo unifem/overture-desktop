@@ -82,6 +82,7 @@ ENV APlusPlus=$DOCKER_HOME/overture/A++P++-$APlusPlus_VERSION/A++/install \
     Overture=$DOCKER_HOME/overture/Overture.v26 \
     CG=$DOCKER_HOME/overture/cg.v26 \
     LAPACK=/usr/lib
+
 WORKDIR $DOCKER_HOME/overture
 
 # Download and compile Overture and CG
@@ -95,9 +96,12 @@ RUN cd $DOCKER_HOME/overture && \
     sed -i -e 's/$distribution=""/$distribution="ubuntu"/g' ./configure && \
     ./configure opt && \
     make -j2 && \
-    make -j2 rapsodi && \
-    \
-    cd ../cg.v26 && \
+    make rapsodi
+
+# Download and compile Overture and CG
+# Note that the "distribution=ubuntu" command-line option breaks the
+# configure script, so we need to hard-code it
+RUN cd $DOCKER_HOME/overture/cg.v26 && \
     make -j2
 
 # Run additional checking. We disable them because it takes too long
