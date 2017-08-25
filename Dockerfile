@@ -42,7 +42,7 @@ RUN apt-get update && \
     curl -O http://ubuntu.cs.utah.edu/ubuntu/pool/main/libx/libxp/libxp6_1.0.2-1ubuntu1_amd64.deb && \
     dpkg -i libxp6_1.0.2-1ubuntu1_amd64.deb && \
     curl -O http://ubuntu.cs.utah.edu/ubuntu/pool/main/libx/libxp/libxp-dev_1.0.2-1ubuntu1_amd64.deb && \
-    dpkg -i libxp-dev_1.0.2-1ubuntu1_amd64 && \
+    dpkg -i libxp-dev_1.0.2-1ubuntu1_amd64.deb && \
     \
     rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* && \
     \
@@ -55,9 +55,7 @@ RUN apt-get update && \
     ln -s -f /usr/lib/x86_64-linux-gnu/libX11.so /usr/local/X11/lib
 
 
-WORKDIR $DOCKER_HOME
 USER $DOCKER_USER
-
 ENV APlusPlus_VERSION=0.8.2 \
     APlusPlus=$DOCKER_HOME/overture/A++P++-$APlusPlus_VERSION/A++/install \
     PPlusPlus=$DOCKER_HOME/overture/A++P++-$APlusPlus_VERSION/P++/install \
@@ -83,6 +81,8 @@ RUN mkdir -p $DOCKER_HOME/overture && cd $DOCKER_HOME/overture && \
     make && \
     make install && \
     make check
+
+WORKDIR $DOCKER_HOME/overture
 
 # Download and compile Overture and CG
 # Note that the "distribution=ubuntu" command-line option breaks the
