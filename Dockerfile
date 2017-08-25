@@ -40,10 +40,10 @@ RUN apt-get update && \
       hdf5-tools && \
     \
     curl -O http://ubuntu.cs.utah.edu/ubuntu/pool/main/libx/libxp/libxp6_1.0.2-1ubuntu1_amd64.deb && \
+    dpkg -i libxp6_1.0.2-1ubuntu1_amd64.deb && \
     curl -O http://ubuntu.cs.utah.edu/ubuntu/pool/main/libx/libxp/libxp-dev_1.0.2-1ubuntu1_amd64.deb && \
-    dpkg -i libxp6_1.0.2-1ubuntu1_amd64.deb libxp-dev_1.0.2-1ubuntu1_amd64 && \
+    dpkg -i libxp-dev_1.0.2-1ubuntu1_amd64 && \
     \
-    echo "@codeaster-gui" >> $DOCKER_HOME/.config/lxsession/LXDE/autostar && \
     rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* && \
     \
     ln -s -f /usr/bin/make /usr/bin/gmake && \
@@ -85,6 +85,8 @@ RUN mkdir -p $DOCKER_HOME/overture && cd $DOCKER_HOME/overture && \
     make check
 
 # Download and compile Overture and CG
+# Note that the "distribution=ubuntu" command-line option breaks the
+# configure script, so we need to hard-code it
 RUN cd $DOCKER_HOME/overture && \
     curl -L http://overtureframework.org/software/cg.v26.tar.gz | tar zx && \
     curl -L http://overtureframework.org/software/Overture.v26.tar.gz | tar zx && \
