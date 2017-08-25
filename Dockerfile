@@ -38,6 +38,8 @@ RUN apt-get update && \
       libxi-dev \
       x11proto-print-dev \
       \
+      liblapack3 \
+      liblapack-dev \
       hdf5-tools && \
     \
     curl -O http://ubuntu.cs.utah.edu/ubuntu/pool/main/libx/libxp/libxp6_1.0.2-1ubuntu1_amd64.deb && \
