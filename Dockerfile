@@ -23,6 +23,7 @@ RUN apt-get update && \
       build-essential \
     	gfortran \
       mpich \
+      libmpich-dev \
       \
       libmotif-dev \
       libgl1-mesa-dev \
