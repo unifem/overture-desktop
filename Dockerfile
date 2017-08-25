@@ -74,14 +74,12 @@ RUN mkdir -p $DOCKER_HOME/overture && cd $DOCKER_HOME/overture && \
     curl -L http://overtureframework.org/software/AP-$APlusPlus_VERSION.tar.gz | tar zx && \
     cd A++P++-$APlusPlus_VERSION && \
     ./configure --enable-SHARED_LIBS --prefix=`pwd` && \
-    make && \
+    make -j2 && \
     make install && \
-    make check && \
     ./configure --enable-PXX --prefix=`pwd` --enable-SHARED_LIBS \
        --with-mpich=/usr/lib/mpich --without-PADRE && \
-    make && \
-    make install && \
-    make check
+    make -j2 && \
+    make install
 
 WORKDIR $DOCKER_HOME/overture
 
@@ -96,11 +94,14 @@ RUN cd $DOCKER_HOME/overture && \
     sed -i -e 's/$distribution=""/$distribution="ubuntu"/g' ./configure && \
     ./configure opt && \
     make -j2 && \
-    make rapsodi && \
-    ./check.p && \
+    make -j2 rapsodi && \
     \
     cd ../cg.v26 && \
-    make && \
-    make check
+    make -j2
+
+# Run additional checking. We disable them because it takes too long
+#RUN cd $DOCKER_HOME/overture/A++P++-$APlusPlus_VERSION && make check && \
+#    make checkcd $DOCKER_HOME/overture/Overture.v26 && ./check.p && \
+#    cd $DOCKER_HOME/overture/cg.v26 && make check
 
 USER root
