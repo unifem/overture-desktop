@@ -57,17 +57,7 @@ RUN apt-get update && \
 
 
 USER $DOCKER_USER
-ENV APlusPlus_VERSION=0.8.2 \
-    APlusPlus=$DOCKER_HOME/overture/A++P++-$APlusPlus_VERSION/A++/install \
-    PPlusPlus=$DOCKER_HOME/overture/A++P++-$APlusPlus_VERSION/P++/install \
-    XLIBS=/usr/local/X11 \
-    OpenGL=/usr \
-    MOTIF=/usr \
-    HDF=/usr/local/hdf5-serial \
-    Overture=$DOCKER_HOME/overture/Overture.v26 \
-    CG=$DOCKER_HOME/overture/cg.v26 \
-    LAPACK=/usr/lib
-
+ENV APlusPlus_VERSION=0.8.2
 
 # Download and compile A++ and P++
 RUN mkdir -p $DOCKER_HOME/overture && cd $DOCKER_HOME/overture && \
@@ -81,6 +71,15 @@ RUN mkdir -p $DOCKER_HOME/overture && cd $DOCKER_HOME/overture && \
     make -j2 && \
     make install
 
+ENV APlusPlus=$DOCKER_HOME/overture/A++P++-$APlusPlus_VERSION/A++/install \
+    PPlusPlus=$DOCKER_HOME/overture/A++P++-$APlusPlus_VERSION/P++/install \
+    XLIBS=/usr/local/X11 \
+    OpenGL=/usr \
+    MOTIF=/usr \
+    HDF=/usr/local/hdf5-serial \
+    Overture=$DOCKER_HOME/overture/Overture.v26 \
+    CG=$DOCKER_HOME/overture/cg.v26 \
+    LAPACK=/usr/lib
 WORKDIR $DOCKER_HOME/overture
 
 # Download and compile Overture and CG
