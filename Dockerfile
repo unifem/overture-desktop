@@ -102,7 +102,7 @@ RUN cd $DOCKER_HOME/overture && \
 # Note that the "distribution=ubuntu" command-line option breaks the
 # configure script, so we need to hard-code it
 RUN cd $DOCKER_HOME/overture/cg.v26 && \
-    make -j2
+    make
 
 # Run additional checking. We disable them because it takes too long
 #RUN cd $DOCKER_HOME/overture/A++P++-$APlusPlus_VERSION && make check && \
