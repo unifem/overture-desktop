@@ -101,7 +101,8 @@ RUN cd $DOCKER_HOME/overture && \
     ./check.p
 
 # Download and compile CG without Maxwell equations
-RUN curl -L http://overtureframework.org/software/cg.v26.tar.gz | tar zx && \
+RUN cd $DOCKER_HOME/overture && \
+    curl -L http://overtureframework.org/software/cg.v26.tar.gz | tar zx && \
     cd $CG && \
     make -j2 libCommon cgad cgcns cgins cgasf cgsm cgmp unitTests
 
