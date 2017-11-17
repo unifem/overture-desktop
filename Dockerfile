@@ -18,6 +18,6 @@ ENV CG=$DOCKER_HOME/overture/cg.v26
 RUN cd $DOCKER_HOME/overture && \
     curl -L http://overtureframework.org/software/cg.v26.tar.gz | tar zx && \
     cd $DOCKER_HOME/overture/cg.v26 && \
-    make && (make check || true)
+    make -j2 libCommon cgad cgcns cgins cgasf cgsm cgmp unitTests
 
 USER root
