@@ -10,7 +10,7 @@
 # The installation procedure follows the (somewhat-oudated) Guide at
 # See http://www.overtureframework.org/documentation/install.pdf
 
-FROM unifem/coupler-desktop:latest
+FROM compdatasci/spyder-desktop:latest
 LABEL maintainer "Xiangmin Jiao <xmjiao@gmail.com>"
 
 USER root
