@@ -10,20 +10,20 @@
 # The installation procedure follows the (somewhat-oudated) Guide at
 # See http://www.overtureframework.org/documentation/install.pdf
 
-FROM compdatasci/spyder-desktop:latest
+FROM compdatasci/coupler-desktop:latest
 LABEL maintainer "Xiangmin Jiao <xmjiao@gmail.com>"
 
 USER root
 WORKDIR /tmp
 
-# Install compilers, mpich, motif, mesa, and hdf5
+# Install compilers, openmpi, motif, mesa, and hdf5
 RUN apt-get update && \
     apt-get install -y --no-install-recommends \
       csh \
       build-essential \
     	gfortran \
-      mpich \
-      libmpich-dev \
+      openmpi \
+      libopenmpi-dev \
       \
       libmotif-dev \
       libgl1-mesa-dev \
@@ -70,7 +70,7 @@ RUN mkdir -p $DOCKER_HOME/overture && cd $DOCKER_HOME/overture && \
     make check && \
     \
     ./configure --enable-PXX --prefix=`pwd` --enable-SHARED_LIBS \
-       --with-mpich=/usr/lib/mpich --without-PADRE && \
+       --with-mpi=/usr/lib/openmpi --without-PADRE && \
     make -j2 && \
     make install && \
     make check
