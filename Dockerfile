@@ -10,7 +10,7 @@
 # The installation procedure follows the (somewhat-oudated) Guide at
 # See http://www.overtureframework.org/documentation/install.pdf
 
-FROM compdatasci/coupler-desktop:latest
+FROM unifem/coupler-desktop:latest
 LABEL maintainer "Xiangmin Jiao <xmjiao@gmail.com>"
 
 USER root
@@ -30,7 +30,7 @@ RUN apt-get update && \
       libglu1-mesa \
       libglu1-mesa-dev \
       \
-      libhdf5-10 \
+      libhdf5-100 \
       libhdf5-dev \
       libperl-dev \
       \
