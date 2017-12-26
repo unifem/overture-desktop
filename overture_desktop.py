@@ -56,12 +56,6 @@ def parse_args(description):
                         action='store_true',
                         default=False)
 
-    parser.add_argument('-c', '--clear',
-                        help='Clear up the folders ~/numgeom, ~/numgeom2 and ~/fastsolve ' +
-                        'and revert them to the precompiled versions in the Docker image.',
-                        action='store_true',
-                        default=False)
-
     parser.add_argument('-d', '--detach',
                         help='Run in background and print container id',
                         action='store_true',
@@ -264,18 +258,6 @@ if __name__ == "__main__":
         volumes += ["-v", args.volume + ":" + docker_home + "/" + APP,
                     "-w", docker_home + "/" + APP]
         vols = [args.volume]
-        if args.tag == "dev":
-            volumes += ["-v", "fastsolve_src:" + docker_home + "/fastsolve",
-                        "-v", "numgeom2_src:" + docker_home + "/numgeom2"]
-            vols += ['fastsolve_src', 'numgeom2_src']
-
-        if args.clear:
-            try:
-                output = subprocess.check_output(["docker", "volume",
-                                                  "rm", "-f"] + vols)
-            except subprocess.CalledProcessError as e:
-                sys.stderr.write(e.output.decode('utf-8'))
-
     else:
         volumes += ["-w", docker_home + "/shared"]
 
