@@ -1,5 +1,5 @@
-# Builds a Docker image for Overture v26 in a Desktop environment
-# with Ubuntu and LXDE.
+# Builds a Docker image for Overture from sourceforge in a Desktop environment
+# with Ubuntu and LXDE in parallel without PETSc.
 #
 # The built image can be found at:
 #   https://hub.docker.com/r/unifem/overture-desktop
@@ -88,7 +88,6 @@ ENV APlusPlus=$DOCKER_HOME/overture/A++P++-${APlusPlus_VERSION}/A++/install \
     XLIBS=/usr/lib/X11 \
     OpenGL=/usr \
     MOTIF=/usr \
-    PETSC_LIB=$PETSC_DIR/lib \
     HDF=/usr/local/hdf5-${HDF5_VERSION} \
     Overture=$DOCKER_HOME/overture/Overture.${OVERTURE_VERSION} \
     LAPACK=/usr/lib
@@ -96,7 +95,7 @@ ENV APlusPlus=$DOCKER_HOME/overture/A++P++-${APlusPlus_VERSION}/A++/install \
 RUN cd $DOCKER_HOME/overture/Overture && \
     OvertureBuild=$Overture ./buildOverture && \
     cd $Overture && \
-    ./configure opt && \
+    ./configure opt linux parallel && \
     make -j2 && \
     make rapsodi && \
     make check
@@ -106,7 +105,7 @@ ENV CG_VERSION=$OVERTURE_VERSION
 ENV CG=$DOCKER_HOME/overture/cg.$CG_VERSION
 RUN ln -s -f $DOCKER_HOME/overture/cg $CG && \
     cd $CG && \
-    make -j2 libCommon cgad cgcns cgins cgasf cgsm cgmp unitTests
+    make usePETSc=off libCommon cgad cgcns cgins cgasf cgsm cgmp unitTests
 
 RUN echo "export PATH=$DOCKER_HOME/overture/Overture.${OVERTURE_VERSION}/bin:\$PATH:." >> \
         $DOCKER_HOME/.profile
