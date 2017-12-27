@@ -1,5 +1,5 @@
-# Builds a Docker image for Overture v26 in a Desktop environment
-# with Ubuntu and LXDE.
+# Builds a Docker image for Overture from sourceforge in a Desktop environment
+# with Ubuntu and LXDE in serial without PETSc.
 #
 # The built image can be found at:
 #   https://hub.docker.com/r/unifem/overture-desktop
@@ -56,7 +56,7 @@ RUN apt-get update && \
 USER $DOCKER_USER
 WORKDIR $DOCKER_HOME
 
-# Download Overture, A++ and P++; compile A++ and P++
+# Download Overture, A++ and P++; compile A++
 ENV APlusPlus_VERSION=0.8.2
 RUN cd $DOCKER_HOME && \
     git clone --depth 1 https://github.com/unifem/overtureframework.git overture && \
@@ -66,37 +66,26 @@ RUN cd $DOCKER_HOME && \
     ./configure --enable-SHARED_LIBS --prefix=`pwd` && \
     make -j2 && \
     make install && \
-    make check && \
-    \
-    export MPI_ROOT=/usr/lib/x86_64-linux-gnu/openmpi && \
-    ./configure --enable-PXX --prefix=`pwd` --enable-SHARED_LIBS \
-       --with-mpi-include="-I${MPI_ROOT}/include" \
-       --with-mpi-lib-dirs="-Wl,-rpath,${MPI_ROOT}/lib -L${MPI_ROOT}/lib" \
-       --with-mpi-libs="-lmpi -lmpi_cxx" \
-       --with-mpirun=/usr/bin/mpirun \
-       --without-PADRE && \
-    make -j2 && \
-    make install && \
     make check
 
 # Compile Overture framework
 WORKDIR $DOCKER_HOME/overture
-ENV OVERTURE_VERSION=2017.12
+ENV OVERTURE_VERSION=v26sf
 
 ENV APlusPlus=$DOCKER_HOME/overture/A++P++-${APlusPlus_VERSION}/A++/install \
-    PPlusPlus=$DOCKER_HOME/overture/A++P++-${APlusPlus_VERSION}/P++/install \
     XLIBS=/usr/lib/X11 \
     OpenGL=/usr \
     MOTIF=/usr \
-    PETSC_LIB=$PETSC_DIR/lib \
     HDF=/usr/local/hdf5-${HDF5_VERSION} \
     Overture=$DOCKER_HOME/overture/Overture.${OVERTURE_VERSION} \
     LAPACK=/usr/lib
 
 RUN cd $DOCKER_HOME/overture/Overture && \
+    mkdir $DOCKER_HOME/cad && \
     OvertureBuild=$Overture ./buildOverture && \
+    rm -rf $DOCKER_HOME/overture/.git $DOCKER_HOME/overture/Overture && \
     cd $Overture && \
-    ./configure opt && \
+    ./configure opt linux && \
     make -j2 && \
     make rapsodi && \
     make check
@@ -104,9 +93,10 @@ RUN cd $DOCKER_HOME/overture/Overture && \
 # Compile CG
 ENV CG_VERSION=$OVERTURE_VERSION
 ENV CG=$DOCKER_HOME/overture/cg.$CG_VERSION
-RUN ln -s -f $DOCKER_HOME/overture/cg $CG && \
+RUN mv $DOCKER_HOME/overture/cg $CG && \
     cd $CG && \
-    make -j2 libCommon cgad cgcns cgins cgasf cgsm cgmp unitTests
+    make -j2 usePETSc=off libCommon && \
+    make -j2 usePETSc=off cgad cgcns cgins cgasf cgsm cgmp
 
 RUN echo "export PATH=$DOCKER_HOME/overture/Overture.${OVERTURE_VERSION}/bin:\$PATH:." >> \
         $DOCKER_HOME/.profile
