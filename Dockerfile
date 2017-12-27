@@ -96,9 +96,11 @@ ENV CG=$DOCKER_HOME/overture/cg.$CG_VERSION
 RUN mv $DOCKER_HOME/overture/cg $CG && \
     cd $CG && \
     make -j2 usePETSc=off libCommon && \
-    make -j2 usePETSc=off cgad cgcns cgins cgasf cgsm cgmp
+    make -j2 usePETSc=off cgad cgcns cgins cgasf cgsm cgmp && \
+    mkdir -p $CG/bin && \
+    ln -s -f $CG/*/bin/* $CG/bin
 
-RUN echo "export PATH=$DOCKER_HOME/overture/Overture.${OVERTURE_VERSION}/bin:\$PATH:." >> \
+RUN echo "export PATH=$Overture/bin:$CG/bin:"\$PATH:." >> \
         $DOCKER_HOME/.profile
 
 WORKDIR $DOCKER_HOME
