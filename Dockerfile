@@ -1,4 +1,4 @@
-# Builds a Docker image for Overture from sourceforge in a Desktop environment
+# Builds a Docker image for Overture from github in a Desktop environment
 # with Ubuntu and LXDE in parallel without PETSc.
 #
 # The built image can be found at:
@@ -55,41 +55,35 @@ RUN apt-get update && \
 
 USER $DOCKER_USER
 WORKDIR $DOCKER_HOME
+ENV AXX_PREFIX=$DOCKER_HOME/overture/A++P++.bin
 
 # Download Overture, A++ and P++; compile A++ and P++
-ENV APlusPlus_VERSION=0.8.2
 RUN cd $DOCKER_HOME && \
-    git clone --depth 1 https://github.com/unifem/overtureframework.git overture && \
+    git clone --depth 1 -b next https://github.com/unifem/overtureframework.git overture && \
+    perl -e 's/https:\/\/github.com\//git@github.com:/g' -p -i $DOCKER_HOME/overture/.git/config && \
     cd $DOCKER_HOME/overture && \
-    curl -L http://overtureframework.org/software/AP-$APlusPlus_VERSION.tar.gz | tar zx && \
-    cd A++P++-$APlusPlus_VERSION && \
-    ./configure --enable-SHARED_LIBS --prefix=`pwd` && \
-    make -j2 && \
-    make install && \
-    make check && \
-    \
+    cd A++P++ && \
     export MPI_ROOT=/usr/lib/x86_64-linux-gnu/openmpi && \
-    ./configure --enable-PXX --prefix=`pwd` --enable-SHARED_LIBS \
+    ./configure --enable-PXX --prefix=--prefix=$AXX_PREFIX --enable-SHARED_LIBS \
        --with-mpi-include="-I${MPI_ROOT}/include" \
        --with-mpi-lib-dirs="-Wl,-rpath,${MPI_ROOT}/lib -L${MPI_ROOT}/lib" \
        --with-mpi-libs="-lmpi -lmpi_cxx" \
        --with-mpirun=/usr/bin/mpirun \
        --without-PADRE && \
     make -j2 && \
-    make install && \
-    make check
+    make install && make check && \
+    make clean && git checkout .
 
 # Compile Overture framework
 WORKDIR $DOCKER_HOME/overture
-ENV OVERTURE_VERSION=2017.12
 
-ENV APlusPlus=$DOCKER_HOME/overture/A++P++-${APlusPlus_VERSION}/A++/install \
-    PPlusPlus=$DOCKER_HOME/overture/A++P++-${APlusPlus_VERSION}/P++/install \
+ENV APlusPlus=$AXX_PREFIX/A++/install \
+    PPlusPlus=$AXX_PREFIX/P++/install \
     XLIBS=/usr/lib/X11 \
     OpenGL=/usr \
     MOTIF=/usr \
     HDF=/usr/local/hdf5-${HDF5_VERSION} \
-    Overture=$DOCKER_HOME/overture/Overture.${OVERTURE_VERSION} \
+    Overture=$DOCKER_HOME/overture/Overture.bin \
     LAPACK=/usr/lib
 
 RUN cd $DOCKER_HOME/overture/Overture && \
@@ -101,14 +95,42 @@ RUN cd $DOCKER_HOME/overture/Overture && \
     make check
 
 # Compile CG
-ENV CG_VERSION=$OVERTURE_VERSION
-ENV CG=$DOCKER_HOME/overture/cg.$CG_VERSION
-RUN ln -s -f $DOCKER_HOME/overture/cg $CG && \
-    cd $CG && \
-    make usePETSc=off libCommon cgad cgcns cgins cgasf cgsm cgmp unitTests
+ENV CG=$DOCKER_HOME/overture/cg
+ENV CGBUILDPREFIX=$DOCKER_HOME/overture/cg.bin
+RUN cd $CG && \
+    make -j2 usePETSc=off libCommon && \
+    make -j2 usePETSc=off cgad cgcns cgins cgasf cgsm cgmp && \
+    mkdir -p $CGBUILDPREFIX/bin && \
+    ln -s -f $CGBUILDPREFIX/*/bin/* $CGBUILDPREFIX/bin
 
-RUN echo "export PATH=$DOCKER_HOME/overture/Overture.${OVERTURE_VERSION}/bin:\$PATH:." >> \
+RUN echo "export PATH=$Overture/bin:$CGBUILDPREFIX/bin:\$PATH:." >> \
         $DOCKER_HOME/.profile
 
 WORKDIR $DOCKER_HOME
 USER root
+
+# Install and customize Atom
+RUN add-apt-repository ppa:webupd8team/atom && \
+    apt-get update && \
+    apt-get install -y --no-install-recommends \
+        atom && \
+    apt-get -y autoremove && \
+    pip install -U \
+        autopep8 flake8 &&\
+    apm install \
+        language-docker \
+        autocomplete-python \
+        git-plus \
+        merge-conflicts \
+        split-diff \
+        platformio-ide-terminal \
+        intentions \
+        busy-signal \
+        linter-ui-default \
+        linter \
+        linter-flake8 \
+        python-autopep8 \
+        clang-format && \
+    rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* && \
+    echo '@atom .' >> $DOCKER_HOME/.config/lxsession/LXDE/autostart && \
+    chown -R $DOCKER_USER:$DOCKER_GROUP $DOCKER_HOME
