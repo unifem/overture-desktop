@@ -42,8 +42,8 @@ def parse_args(description):
 
     parser.add_argument('-v', '--volume',
                         help='A data volume to be mounted at ~/' + APP + '. ' +
-                        'The default is ' + APP + '_src.',
-                        default=APP + "_src")
+                        'The default is ' + APP + '_project.',
+                        default=APP + "_project")
 
     parser.add_argument('-p', '--pull',
                         help='Pull the latest Docker image. ' +
@@ -53,6 +53,11 @@ def parse_args(description):
 
     parser.add_argument('-r', '--reset',
                         help='Reset configurations to default.',
+                        action='store_true',
+                        default=False)
+
+    parser.add_argument('-c', '--clear',
+                        help='Clear the project data volume (please use with caution).',
                         action='store_true',
                         default=False)
 
@@ -177,7 +182,7 @@ def handle_interrupt(container):
     except KeyboardInterrupt:
         print('*** Stopping the server.')
         subprocess.Popen(["docker", "exec", container,
-                          "killall", "startvnc.sh"],
+                          "killall", "my_init"],
                          stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         sys.exit(0)
 
@@ -255,9 +260,15 @@ if __name__ == "__main__":
         volumes += ["-v", "matlab_bin:/usr/local/MATLAB/"]
 
     if args.volume:
-        volumes += ["-v", args.volume + ":" + docker_home + "/" + APP,
-                    "-w", docker_home + "/" + APP]
-        vols = [args.volume]
+        if args.clear:
+            try:
+                output = subprocess.check_output(["docker", "volume",
+                                                  "rm", "-f", args.volume])
+            except subprocess.CalledProcessError as e:
+                sys.stderr.write(e.output.decode('utf-8'))
+
+        volumes += ["-v", args.volume + ":" + docker_home + "/overture",
+                    "-w", docker_home + "/overture"]
     else:
         volumes += ["-w", docker_home + "/shared"]
 
