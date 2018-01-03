@@ -66,7 +66,7 @@ RUN add-apt-repository ppa:webupd8team/atom && \
         busy-signal \
         python-autopep8 \
         clang-format && \
-    chown -R $DOCKER_USER:$DOCKER_GROUP $DOCKER_HOME  \
+    chown -R $DOCKER_USER:$DOCKER_GROUP $DOCKER_HOME && \
     \
     rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
