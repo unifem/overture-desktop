@@ -64,7 +64,7 @@ RUN cd $DOCKER_HOME && \
     cd $DOCKER_HOME/overture && \
     cd A++P++ && \
     export MPI_ROOT=/usr/lib/x86_64-linux-gnu/openmpi && \
-    ./configure --enable-PXX --prefix=--prefix=$AXX_PREFIX --enable-SHARED_LIBS \
+    ./configure --enable-PXX --prefix=$AXX_PREFIX --enable-SHARED_LIBS \
        --with-mpi-include="-I${MPI_ROOT}/include" \
        --with-mpi-lib-dirs="-Wl,-rpath,${MPI_ROOT}/lib -L${MPI_ROOT}/lib" \
        --with-mpi-libs="-lmpi -lmpi_cxx" \
