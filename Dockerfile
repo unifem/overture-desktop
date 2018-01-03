@@ -1,4 +1,4 @@
-# Builds a Docker image for Overture from sourceforge in a Desktop environment
+# Builds a Docker image for Overture from github in a Desktop environment
 # with Ubuntu and LXDE in serial without PETSc.
 #
 # The built image can be found at:
@@ -55,30 +55,28 @@ RUN apt-get update && \
 
 USER $DOCKER_USER
 WORKDIR $DOCKER_HOME
+ENV AXX_PREFIX=$DOCKER_HOME/overture/A++P++.bin
 
-# Download Overture, A++ and P++; compile A++
-ENV APlusPlus_VERSION=0.8.2
+# Download Overture, A++ and P++; compile only A++
 RUN cd $DOCKER_HOME && \
-    git clone --depth 1 https://github.com/unifem/overtureframework.git overture && \
+    git clone --depth 1 -b next https://github.com/unifem/overtureframework.git overture && \
     perl -e 's/https:\/\/github.com\//git@github.com:/g' -p -i $DOCKER_HOME/overture/.git/config && \
     cd $DOCKER_HOME/overture && \
-    curl -L http://overtureframework.org/software/AP-$APlusPlus_VERSION.tar.gz | tar zx && \
-    cd A++P++-$APlusPlus_VERSION && \
-    ./configure --enable-SHARED_LIBS --prefix=`pwd` && \
+    cd A++P++ && \
+    ./configure --enable-SHARED_LIBS --prefix=$AXX_PREFIX && \
     make -j2 && \
-    make install && \
-    make check
+    make install && make check && \
+    make clean && git checkout .
 
 # Compile Overture framework
 WORKDIR $DOCKER_HOME/overture
-ENV OVERTURE_VERSION=v26sf
 
-ENV APlusPlus=$DOCKER_HOME/overture/A++P++-${APlusPlus_VERSION}/A++/install \
+ENV APlusPlus=$AXX_PREFIX/A++/install \
     XLIBS=/usr/lib/X11 \
     OpenGL=/usr \
     MOTIF=/usr \
     HDF=/usr/local/hdf5-${HDF5_VERSION} \
-    Overture=$DOCKER_HOME/overture/Overture.${OVERTURE_VERSION} \
+    Overture=$DOCKER_HOME/overture/Overture.bin \
     LAPACK=/usr/lib
 
 RUN cd $DOCKER_HOME/overture/Overture && \
@@ -91,17 +89,42 @@ RUN cd $DOCKER_HOME/overture/Overture && \
     make check
 
 # Compile CG
-ENV CG_VERSION=$OVERTURE_VERSION
-ENV CG=$DOCKER_HOME/overture/cg.$CG_VERSION
-RUN mv $DOCKER_HOME/overture/cg $CG && \
-    cd $CG && \
+ENV CG=$DOCKER_HOME/overture/cg
+ENV CGBUILDPREFIX=$DOCKER_HOME/overture/cg.bin
+RUN cd $CG && \
     make -j2 usePETSc=off libCommon && \
     make -j2 usePETSc=off cgad cgcns cgins cgasf cgsm cgmp && \
-    mkdir -p $CG/bin && \
-    ln -s -f $CG/*/bin/* $CG/bin
+    mkdir -p $CGBUILDPREFIX/bin && \
+    ln -s -f $CGBUILDPREFIX/*/bin/* $CGBUILDPREFIX/bin
 
-RUN echo "export PATH=$Overture/bin:$CG/bin:\$PATH:." >> \
+RUN echo "export PATH=$Overture/bin:$CGBUILDPREFIX/bin:\$PATH:." >> \
         $DOCKER_HOME/.profile
 
 WORKDIR $DOCKER_HOME
 USER root
+
+# Install and customize Atom
+RUN add-apt-repository ppa:webupd8team/atom && \
+    apt-get update && \
+    apt-get install -y --no-install-recommends \
+        atom && \
+    apt-get -y autoremove && \
+    pip install -U \
+        autopep8 flake8 &&\
+    apm install \
+        language-docker \
+        autocomplete-python \
+        git-plus \
+        merge-conflicts \
+        split-diff \
+        platformio-ide-terminal \
+        intentions \
+        busy-signal \
+        linter-ui-default \
+        linter \
+        linter-flake8 \
+        python-autopep8 \
+        clang-format && \
+    rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* && \
+    echo '@atom .' >> $DOCKER_HOME/.config/lxsession/LXDE/autostart && \
+    chown -R $DOCKER_USER:$DOCKER_GROUP $DOCKER_HOME
