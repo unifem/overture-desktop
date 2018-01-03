@@ -83,7 +83,6 @@ ENV APlusPlus=$DOCKER_HOME/overture/A++P++-${APlusPlus_VERSION}/A++/install \
 RUN cd $DOCKER_HOME/overture/Overture && \
     mkdir $DOCKER_HOME/cad && \
     OvertureBuild=$Overture ./buildOverture && \
-    rm -rf $DOCKER_HOME/overture/.git $DOCKER_HOME/overture/Overture && \
     cd $Overture && \
     ./configure opt linux && \
     make -j2 && \
