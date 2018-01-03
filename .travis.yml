@@ -1,9 +1,19 @@
-sudo: required
+os: linux
+dist: trusty
+language: python
+services: docker
+sudo: false
 
-services:
-  - docker
+env:
+  global:
+    - BASE=unifem/meshdb-desktop TAG=parallel
+
+before_script:
+  - docker --version
+  - docker login -u "$DOCKER_USERNAME" -p "$DOCKER_USERPASS"
+  - docker pull $BASE
 
 script:
-  - docker login -u "$DOCKER_USERNAME" -p "$DOCKER_USERPASS"
-  - docker build --tag unifem/overture-desktop . && docker push unifem/overture-desktop
+  - 'docker build --tag unifem/overture-desktop:$TAG . && 
+     docker push unifem/overture-desktop'
   - docker images
