@@ -67,8 +67,6 @@ RUN add-apt-repository ppa:webupd8team/atom && \
         busy-signal \
         python-autopep8 \
         clang-format && \
-    rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* && \
-    echo '@atom .' >> $DOCKER_HOME/.config/lxsession/LXDE/autostart && \
     chown -R $DOCKER_USER:$DOCKER_GROUP $DOCKER_HOME && \
     \
     rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
@@ -92,8 +90,7 @@ RUN cd $DOCKER_HOME && \
        --with-mpirun=/usr/bin/mpirun \
        --without-PADRE && \
     make -j2 && \
-    make install && make check && \
-    make clean && git checkout .
+    make install
 
 # Compile Overture framework
 WORKDIR $DOCKER_HOME/overture
@@ -112,8 +109,7 @@ RUN cd $DOCKER_HOME/overture/Overture && \
     cd $Overture && \
     ./configure opt linux parallel cc=mpicc bcc=gcc CC=mpicxx bCC=g++ FC=mpif90 bFC=gfortran && \
     make -j2 && \
-    make rapsodi && \
-    make check
+    make rapsodi
 
 # Compile CG
 ENV CG=$DOCKER_HOME/overture/cg
