@@ -114,6 +114,8 @@ RUN cd $CG && \
     ln -s -f $CGBUILDPREFIX/*/bin/* $CGBUILDPREFIX/bin
 
 RUN echo "export PATH=$Overture/bin:$CGBUILDPREFIX/bin:\$PATH:." >> \
+        $DOCKER_HOME/.profile && \
+    echo "export LD_LIBRARY_PATH=$CG/cns/lib:$CG/asf/lib:$CG/ins/lib:$CG/common/lib:$CG/sm/lib:$APlusPlus/lib:$Overture/lib:\$LD_LIBRARY_PATH" >> \
         $DOCKER_HOME/.profile
 
 WORKDIR $DOCKER_HOME
