@@ -108,7 +108,7 @@ RUN cd $DOCKER_HOME/overture/Overture && \
     OvertureBuild=$Overture ./buildOverture && \
     cd $Overture && \
     ./configure opt linux parallel cc=mpicc bcc=gcc CC=mpicxx bCC=g++ FC=mpif90 bFC=gfortran && \
-    make -j2 && \
+    make -j4 && \
     make rapsodi
 
 # Compile CG
@@ -116,7 +116,7 @@ ENV CG=$DOCKER_HOME/overture/cg
 ENV CGBUILDPREFIX=$DOCKER_HOME/overture/cg.bin
 RUN cd $CG && \
     make -j2 usePETSc=off libCommon && \
-    make -j2 usePETSc=off cgad cgcns cgins cgasf cgsm cgmp && \
+    make -j4 usePETSc=off cgad cgcns cgins cgasf cgsm cgmp && \
     mkdir -p $CGBUILDPREFIX/bin && \
     ln -s -f $CGBUILDPREFIX/*/bin/* $CGBUILDPREFIX/bin
 
