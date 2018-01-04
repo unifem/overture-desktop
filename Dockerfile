@@ -95,7 +95,7 @@ RUN cd $DOCKER_HOME && \
 # Compile Overture framework
 WORKDIR $DOCKER_HOME/overture
 
-ENV APlusPlus=$PXX_PREFIX/A++/install \
+ENV APlusPlus=$PXX_PREFIX/P++/install \
     PPlusPlus=$PXX_PREFIX/P++/install \
     XLIBS=/usr/lib/X11 \
     OpenGL=/usr \
