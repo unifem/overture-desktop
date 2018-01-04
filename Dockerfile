@@ -18,9 +18,7 @@ USER root
 WORKDIR /tmp
 
 # Install compilers, openmpi, motif and mesa to prepare for overture
-# Also install and customize Atom
-RUN add-apt-repository ppa:webupd8team/atom && \
-    apt-get update && \
+RUN apt-get update && \
     apt-get install -y --no-install-recommends \
       csh \
       build-essential \
@@ -40,8 +38,7 @@ RUN add-apt-repository ppa:webupd8team/atom && \
       x11proto-print-dev \
       \
       liblapack3 \
-      liblapack-dev \
-      atom && \
+      liblapack-dev && \
     \
     curl -O http://ubuntu.cs.utah.edu/ubuntu/pool/main/libx/libxp/libxp6_1.0.2-1ubuntu1_amd64.deb && \
     dpkg -i libxp6_1.0.2-1ubuntu1_amd64.deb && \
@@ -53,22 +50,6 @@ RUN add-apt-repository ppa:webupd8team/atom && \
     ln -s -f /usr/lib/x86_64-linux-gnu /usr/lib64 && \
     ln -s -f /usr/lib/x86_64-linux-gnu/libX11.so /usr/lib/X11 && \
     \
-    apt-get -y autoremove && \
-    pip install -U \
-        autopep8 &&\
-    apm install \
-        language-docker \
-        autocomplete-python \
-        git-plus \
-        merge-conflicts \
-        split-diff \
-        platformio-ide-terminal \
-        intentions \
-        busy-signal \
-        python-autopep8 \
-        clang-format && \
-    chown -R $DOCKER_USER:$DOCKER_GROUP $DOCKER_HOME && \
-    \
     rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
 USER $DOCKER_USER
@@ -76,7 +57,7 @@ WORKDIR $DOCKER_HOME
 ENV PXX_PREFIX=$DOCKER_HOME/overture/A++P++
 
 # Download Overture, A++ and P++; compile A++ and P++
-# Note that P++ must be in the source tree, or Overture fails to compile
+# Note that P++ must be in the source tree, or Overture would fail to compile
 RUN cd $DOCKER_HOME && \
     git clone --depth 1 -b next https://github.com/unifem/overtureframework.git overture && \
     perl -e 's/https:\/\/github.com\//git@github.com:/g' -p -i $DOCKER_HOME/overture/.git/config && \
@@ -108,7 +89,7 @@ RUN cd $DOCKER_HOME/overture/Overture && \
     OvertureBuild=$Overture ./buildOverture && \
     cd $Overture && \
     ./configure opt linux parallel cc=mpicc bcc=gcc CC=mpicxx bCC=g++ FC=mpif90 bFC=gfortran && \
-    make -j4 && \
+    make -j2 && \
     make rapsodi
 
 # Compile CG
@@ -116,7 +97,7 @@ ENV CG=$DOCKER_HOME/overture/cg
 ENV CGBUILDPREFIX=$DOCKER_HOME/overture/cg.bin
 RUN cd $CG && \
     make -j2 usePETSc=off libCommon && \
-    make -j4 usePETSc=off cgad cgcns cgins cgasf cgsm cgmp && \
+    make -j2 usePETSc=off cgad cgcns cgins cgasf cgsm cgmp && \
     mkdir -p $CGBUILDPREFIX/bin && \
     ln -s -f $CGBUILDPREFIX/*/bin/* $CGBUILDPREFIX/bin
 
