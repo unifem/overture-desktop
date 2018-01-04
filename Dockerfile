@@ -18,7 +18,9 @@ USER root
 WORKDIR /tmp
 
 # Install compilers, openmpi, motif and mesa to prepare for overture
-RUN apt-get update && \
+# Also install and customize Atom
+RUN add-apt-repository ppa:webupd8team/atom && \
+    apt-get update && \
     apt-get install -y --no-install-recommends \
       csh \
       build-essential \
@@ -38,7 +40,8 @@ RUN apt-get update && \
       x11proto-print-dev \
       \
       liblapack3 \
-      liblapack-dev && \
+      liblapack-dev \
+      atom && \
     \
     curl -O http://ubuntu.cs.utah.edu/ubuntu/pool/main/libx/libxp/libxp6_1.0.2-1ubuntu1_amd64.deb && \
     dpkg -i libxp6_1.0.2-1ubuntu1_amd64.deb && \
@@ -50,21 +53,39 @@ RUN apt-get update && \
     ln -s -f /usr/lib/x86_64-linux-gnu /usr/lib64 && \
     ln -s -f /usr/lib/x86_64-linux-gnu/libX11.so /usr/lib/X11 && \
     \
+    apt-get -y autoremove && \
+    pip install -U \
+        autopep8 &&\
+    apm install \
+        language-docker \
+        autocomplete-python \
+        git-plus \
+        merge-conflicts \
+        split-diff \
+        platformio-ide-terminal \
+        intentions \
+        busy-signal \
+        python-autopep8 \
+        clang-format && \
+    rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* && \
+    echo '@atom .' >> $DOCKER_HOME/.config/lxsession/LXDE/autostart && \
+    chown -R $DOCKER_USER:$DOCKER_GROUP $DOCKER_HOME && \
+    \
     rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
-
 
 USER $DOCKER_USER
 WORKDIR $DOCKER_HOME
-ENV AXX_PREFIX=$DOCKER_HOME/overture/A++P++.bin
+ENV PXX_PREFIX=$DOCKER_HOME/overture/A++P++
 
 # Download Overture, A++ and P++; compile A++ and P++
+# Note that P++ must be in the source tree, or Overture fails to compile
 RUN cd $DOCKER_HOME && \
     git clone --depth 1 -b next https://github.com/unifem/overtureframework.git overture && \
     perl -e 's/https:\/\/github.com\//git@github.com:/g' -p -i $DOCKER_HOME/overture/.git/config && \
     cd $DOCKER_HOME/overture && \
     cd A++P++ && \
     export MPI_ROOT=/usr/lib/x86_64-linux-gnu/openmpi && \
-    ./configure --enable-PXX --prefix=$AXX_PREFIX --enable-SHARED_LIBS \
+    ./configure --enable-PXX --prefix=$PXX_PREFIX --enable-SHARED_LIBS \
        --with-mpi-include="-I${MPI_ROOT}/include" \
        --with-mpi-lib-dirs="-Wl,-rpath,${MPI_ROOT}/lib -L${MPI_ROOT}/lib" \
        --with-mpi-libs="-lmpi -lmpi_cxx" \
@@ -77,19 +98,19 @@ RUN cd $DOCKER_HOME && \
 # Compile Overture framework
 WORKDIR $DOCKER_HOME/overture
 
-ENV APlusPlus=$AXX_PREFIX/A++/install \
-    PPlusPlus=$AXX_PREFIX/P++/install \
+ENV APlusPlus=$PXX_PREFIX/A++/install \
+    PPlusPlus=$PXX_PREFIX/P++/install \
     XLIBS=/usr/lib/X11 \
     OpenGL=/usr \
     MOTIF=/usr \
-    HDF=/usr/local/hdf5-${HDF5_VERSION} \
+    HDF=/usr/local/hdf5-${HDF5_VERSION}-openmpi \
     Overture=$DOCKER_HOME/overture/Overture.bin \
     LAPACK=/usr/lib
 
 RUN cd $DOCKER_HOME/overture/Overture && \
     OvertureBuild=$Overture ./buildOverture && \
     cd $Overture && \
-    ./configure opt linux parallel && \
+    ./configure opt linux parallel cc=mpicc bcc=gcc CC=mpicxx bCC=g++ FC=mpif90 bFC=gfortran && \
     make -j2 && \
     make rapsodi && \
     make check
@@ -108,29 +129,3 @@ RUN echo "export PATH=$Overture/bin:$CGBUILDPREFIX/bin:\$PATH:." >> \
 
 WORKDIR $DOCKER_HOME
 USER root
-
-# Install and customize Atom
-RUN add-apt-repository ppa:webupd8team/atom && \
-    apt-get update && \
-    apt-get install -y --no-install-recommends \
-        atom && \
-    apt-get -y autoremove && \
-    pip install -U \
-        autopep8 flake8 &&\
-    apm install \
-        language-docker \
-        autocomplete-python \
-        git-plus \
-        merge-conflicts \
-        split-diff \
-        platformio-ide-terminal \
-        intentions \
-        busy-signal \
-        linter-ui-default \
-        linter \
-        linter-flake8 \
-        python-autopep8 \
-        clang-format && \
-    rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* && \
-    echo '@atom .' >> $DOCKER_HOME/.config/lxsession/LXDE/autostart && \
-    chown -R $DOCKER_USER:$DOCKER_GROUP $DOCKER_HOME
