@@ -15,9 +15,6 @@ FROM unifem/overture-desktop:base
 LABEL maintainer "Xiangmin Jiao <xmjiao@gmail.com>"
 
 USER $DOCKER_USER
-WORKDIR $DOCKER_HOME
-
-# Compile Overture framework
 WORKDIR $DOCKER_HOME/overture
 
 ENV APlusPlus=$PXX_PREFIX/P++/install \
