@@ -18,9 +18,7 @@ USER root
 WORKDIR /tmp
 
 # Install compilers, openmpi, motif and mesa to prepare for overture
-# Also install Atom for editing
-RUN add-apt-repository ppa:webupd8team/atom && \
-    apt-get update && \
+RUN apt-get update && \
     apt-get install -y --no-install-recommends \
       csh \
       build-essential \
@@ -40,9 +38,7 @@ RUN add-apt-repository ppa:webupd8team/atom && \
       x11proto-print-dev \
       \
       liblapack3 \
-      liblapack-dev \
-      \
-      atom && \
+      liblapack-dev && \
     \
     curl -O http://ubuntu.cs.utah.edu/ubuntu/pool/main/libx/libxp/libxp6_1.0.2-1ubuntu1_amd64.deb && \
     dpkg -i libxp6_1.0.2-1ubuntu1_amd64.deb && \
@@ -53,20 +49,6 @@ RUN add-apt-repository ppa:webupd8team/atom && \
     \
     ln -s -f /usr/lib/x86_64-linux-gnu /usr/lib64 && \
     ln -s -f /usr/lib/x86_64-linux-gnu/libX11.so /usr/lib/X11 && \
-    \
-    pip install -U autopep8 && \
-    apm install \
-        language-docker \
-        autocomplete-python \
-        git-plus \
-        merge-conflicts \
-        split-diff \
-        platformio-ide-terminal \
-        intentions \
-        busy-signal \
-        python-autopep8 \
-        clang-format && \
-    chown -R $DOCKER_USER:$DOCKER_GROUP $DOCKER_HOME && \
     \
     rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
