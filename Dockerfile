@@ -1,4 +1,4 @@
-# Builds a Docker image for Overture from github in a Desktop environment
+# Builds a Docker image for the base of Overture in a Desktop environment
 # with Ubuntu and LXDE in serial without PETSc.
 #
 # The built image can be found at:
@@ -70,53 +70,45 @@ RUN add-apt-repository ppa:webupd8team/atom && \
     \
     rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
+# Build HDF5-1.8.20 from source both in serial and parallel
+# HDF5-1.10.x in Ubuntu 17.10 is incompatible with Overture
+ENV HDF5_VERSION=1.8.20
+RUN cd /tmp && \
+    curl -L https://support.hdfgroup.org/ftp/HDF5/current18/src/hdf5-${HDF5_VERSION}.tar.gz | \
+        tar zx && \
+    cd hdf5-${HDF5_VERSION} && \
+    ./configure --enable-shared --prefix /usr/local/hdf5-${HDF5_VERSION} && \
+    make -j2 && make install && \
+    \
+    make clean && \
+    ./configure --enable-shared --enable-parallel --prefix /usr/local/hdf5-${HDF5_VERSION}-openmpi && \
+    make -j2 && make install && \
+    \
+    rm -rf /tmp/*
+
 USER $DOCKER_USER
 WORKDIR $DOCKER_HOME
-ENV AXX_PREFIX=$DOCKER_HOME/overture/A++P++.bin
+ENV AXX_PREFIX=$DOCKER_HOME/A++P++.bin
+ENV PXX_PREFIX=$DOCKER_HOME/A++P++
 
-# Download Overture, A++ and P++; compile only A++
-# Do not run "make check" to avoid timeout
+# Download A++ and P++; compile A++ and P++
+# Note that P++ must be in the source tree, or Overture would fail to compile
 RUN cd $DOCKER_HOME && \
-    git clone --depth 1 -b next https://github.com/unifem/overtureframework.git overture && \
-    perl -e 's/https:\/\/github.com\//git\@github.com:/g' -p -i $DOCKER_HOME/overture/.git/config && \
-    cd $DOCKER_HOME/overture && \
+    git clone --depth 1 https://github.com/unifem/aplusplus.git A++P++ && \
     cd A++P++ && \
     ./configure --enable-SHARED_LIBS --prefix=$AXX_PREFIX && \
     make -j2 && \
-    make install
-
-# Compile Overture framework
-WORKDIR $DOCKER_HOME/overture
-
-ENV APlusPlus=$AXX_PREFIX/A++/install \
-    XLIBS=/usr/lib/X11 \
-    OpenGL=/usr \
-    MOTIF=/usr \
-    HDF=/usr/local/hdf5-${HDF5_VERSION} \
-    Overture=$DOCKER_HOME/overture/Overture.bin \
-    LAPACK=/usr/lib
-
-RUN cd $DOCKER_HOME/overture/Overture && \
-    mkdir $DOCKER_HOME/cad && \
-    OvertureBuild=$Overture ./buildOverture && \
-    cd $Overture && \
-    ./configure opt linux && \
+    make install && \
+    \
+    export MPI_ROOT=/usr/lib/x86_64-linux-gnu/openmpi && \
+    ./configure --enable-PXX --prefix=$PXX_PREFIX --enable-SHARED_LIBS \
+       --with-mpi-include="-I${MPI_ROOT}/include" \
+       --with-mpi-lib-dirs="-Wl,-rpath,${MPI_ROOT}/lib -L${MPI_ROOT}/lib" \
+       --with-mpi-libs="-lmpi -lmpi_cxx" \
+       --with-mpirun=/usr/bin/mpirun \
+       --without-PADRE && \
     make -j2 && \
-    make rapsodi
-
-# Compile CG
-ENV CG=$DOCKER_HOME/overture/cg
-ENV CGBUILDPREFIX=$DOCKER_HOME/overture/cg.bin
-RUN cd $CG && \
-    make -j2 usePETSc=off libCommon && \
-    make -j2 usePETSc=off cgad cgcns cgins cgasf cgsm cgmp && \
-    mkdir -p $CGBUILDPREFIX/bin && \
-    ln -s -f $CGBUILDPREFIX/*/bin/* $CGBUILDPREFIX/bin
-
-RUN echo "export PATH=$Overture/bin:$CGBUILDPREFIX/bin:\$PATH:." >> \
-        $DOCKER_HOME/.profile && \
-    echo "export LD_LIBRARY_PATH=$APlusPlus/lib:$Overture/lib:$CG/cns/lib:$CG/ad/lib:$CG/asf/lib:$CG/ins/lib:$CG/common/lib:$CG/sm/lib:$CG/mp/lib:\$LD_LIBRARY_PATH" >> \
-        $DOCKER_HOME/.profile
+    make install
 
 WORKDIR $DOCKER_HOME
 USER root
