@@ -40,7 +40,6 @@ RUN add-apt-repository ppa:webupd8team/atom && \
     rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
 USER $DOCKER_USER
-WORKDIR $DOCKER_HOME/overture
 ENV APlusPlus=$AXX_PREFIX/A++/install \
     XLIBS=/usr/lib/X11 \
     OpenGL=/usr \
