@@ -6,7 +6,7 @@ sudo: false
 
 env:
   global:
-    - BASE=unifem/meshdb-desktop TAG=next
+    - BASE=unifem/overture-desktop:base TAG=next
 
 before_script:
   - docker --version
@@ -14,6 +14,12 @@ before_script:
   - docker pull $BASE
 
 script:
-  - 'docker build --tag unifem/overture-desktop:$TAG . &&
-     docker push unifem/overture-desktop'
+  - - '[[ -n $(git log --since $(docker inspect $BASE | grep Created |
+             perl -e "s/.+\"([\d-:T]+).+$/\$1/g" -p)) &&
+       "$TRAVIS_EVENT_TYPE" == "push" && -n "$TRAVIS_COMMIT_RANGE" &&
+        -z "$(git diff --name-only $TRAVIS_COMMIT_RANGE |
+            grep -e Dockerfile -e .travis.yml -e image -e WELCOME)" ]] ||
+    (docker build --tag unifem/overture-desktop:$TAG . &&
+     docker push unifem/overture-desktop &&
+     touch success)'
   - docker images
