@@ -54,6 +54,7 @@ RUN cd $DOCKER_HOME && \
     perl -e 's/https:\/\/github.com\//git@github.com:/g' -p -i $DOCKER_HOME/overture/.git/config && \
     \
     mkdir $DOCKER_HOME/cad && \
+    cd overture/Overture && \
     OvertureBuild=$Overture ./buildOverture && \
     cd $Overture && \
     ./configure opt linux && \
