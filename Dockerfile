@@ -16,6 +16,7 @@ LABEL maintainer "Xiangmin Jiao <xmjiao@gmail.com>"
 
 USER $DOCKER_USER
 WORKDIR $DOCKER_HOME/overture
+
 ENV APlusPlus=$AXX_PREFIX/A++/install \
     XLIBS=/usr/lib/X11 \
     OpenGL=/usr \
@@ -25,7 +26,7 @@ ENV APlusPlus=$AXX_PREFIX/A++/install \
     LAPACK=/usr/lib
 
 # Compile Overture framework
-RUN RUN cd $DOCKER_HOME && \
+RUN cd $DOCKER_HOME && \
     git clone --depth 1 https://github.com/unifem/overtureframework.git overture && \
     perl -e 's/https:\/\/github.com\//git@github.com:/g' -p -i $DOCKER_HOME/overture/.git/config && \
     \
@@ -39,9 +40,7 @@ RUN RUN cd $DOCKER_HOME && \
 # Compile CG
 ENV CG=$DOCKER_HOME/overture/cg
 ENV CGBUILDPREFIX=$DOCKER_HOME/overture/cg.bin
-RUN cd $DOCKER_HOME/overture && \
-    \
-    cd $CG && \
+RUN cd $CG && \
     make -j2 usePETSc=off libCommon && \
     make -j2 usePETSc=off cgad cgcns cgins cgasf cgsm cgmp && \
     mkdir -p $CGBUILDPREFIX/bin && \
