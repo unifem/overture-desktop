@@ -14,7 +14,7 @@ before_script:
   - docker pull $BASE
 
 script:
-  - - '[[ -n $(git log --since $(docker inspect $BASE | grep Created |
+  - '[[ -n $(git log --since $(docker inspect $BASE | grep Created |
              perl -e "s/.+\"([\d-:T]+).+$/\$1/g" -p)) &&
        "$TRAVIS_EVENT_TYPE" == "push" && -n "$TRAVIS_COMMIT_RANGE" &&
         -z "$(git diff --name-only $TRAVIS_COMMIT_RANGE |
