@@ -15,7 +15,6 @@ FROM unifem/overture-desktop:base
 LABEL maintainer "Xiangmin Jiao <xmjiao@gmail.com>"
 
 USER $DOCKER_USER
-WORKDIR $DOCKER_HOME/overture
 
 ENV APlusPlus=$AXX_PREFIX/A++/install \
     XLIBS=/usr/lib/X11 \
@@ -31,6 +30,7 @@ RUN cd $DOCKER_HOME && \
     perl -e 's/https:\/\/github.com\//git@github.com:/g' -p -i $DOCKER_HOME/overture/.git/config && \
     \
     mkdir $DOCKER_HOME/cad && \
+    cd overture/Overture && \
     OvertureBuild=$Overture ./buildOverture && \
     cd $Overture && \
     ./configure opt linux && \
