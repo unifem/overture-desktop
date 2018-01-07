@@ -17,7 +17,6 @@ LABEL maintainer "Xiangmin Jiao <xmjiao@gmail.com>"
 USER root
 WORKDIR /tmp
 
-# Install compilers, openmpi, motif and mesa to prepare for Overture
 # Also install Atom for editing
 RUN add-apt-repository ppa:webupd8team/atom && \
     apt-get update && \
