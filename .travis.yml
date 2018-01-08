@@ -6,7 +6,7 @@ sudo: false
 
 env:
   global:
-    - BASE=unifem/overture-desktop:base TAG=parallel
+    - BASE=unifem/overture-desktop:base TAG=petsc
 
 before_script:
   - docker --version

@@ -1,5 +1,5 @@
 # Builds a Docker image for Overture from github in a Desktop environment
-# with Ubuntu and LXDE in parallel without PETSc.
+# with Ubuntu and LXDE in parallel with PETSc 3.7.x.
 #
 # The built image can be found at:
 #   https://hub.docker.com/r/unifem/overture-desktop
@@ -23,15 +23,17 @@ ENV APlusPlus=$PXX_PREFIX/P++/install \
     MOTIF=/usr \
     HDF=/usr/local/hdf5-${HDF5_VERSION}-openmpi \
     Overture=$DOCKER_HOME/overture/Overture.bin \
-    LAPACK=/usr/lib
+    LAPACK=/usr/lib \
+    PETSC_ARCH=x86_64-linux-gnu-real \
+    PETSC_LIB=/usr/lib/x86_64-linux-gnu
 
 RUN cd $DOCKER_HOME && \
-    git clone --depth 1 https://github.com/unifem/overtureframework.git overture && \
+    git clone --depth 1 -b next https://github.com/unifem/overtureframework.git overture && \
     perl -e 's/https:\/\/github.com\//git\@github.com:/g' -p -i $DOCKER_HOME/overture/.git/config && \
     cd $DOCKER_HOME/overture/Overture && \
     OvertureBuild=$Overture ./buildOverture && \
     cd $Overture && \
-    ./configure opt linux parallel cc=mpicc bcc=gcc CC=mpicxx bCC=g++ FC=mpif90 bFC=gfortran && \
+    ./configure opt linux parallel petsc cc=mpicc bcc=gcc CC=mpicxx bCC=g++ FC=mpif90 bFC=gfortran && \
     make -j2 && \
     make rapsodi
 
@@ -39,8 +41,8 @@ RUN cd $DOCKER_HOME && \
 ENV CG=$DOCKER_HOME/overture/cg
 ENV CGBUILDPREFIX=$DOCKER_HOME/overture/cg.bin
 RUN cd $CG && \
-    make -j2 usePETSc=off libCommon && \
-    make -j2 usePETSc=off cgad cgcns cgins cgasf cgsm cgmp && \
+    make -j2 usePETSc=on OV_USE_PETSC_3=1 libCommon && \
+    make -j2 usePETSc=on OV_USE_PETSC_3=1 cgad cgcns cgins cgasf cgsm cgmp && \
     mkdir -p $CGBUILDPREFIX/bin && \
     ln -s -f $CGBUILDPREFIX/*/bin/* $CGBUILDPREFIX/bin
 
