@@ -1,5 +1,5 @@
 # Builds a Docker image for Overture from github in a Desktop environment
-# with Ubuntu and LXDE in serial without PETSc.
+# with Ubuntu and LXDE in serial with PETSc 3.7.x.
 #
 # The built image can be found at:
 #   https://hub.docker.com/r/unifem/overture-desktop
@@ -17,6 +17,7 @@ LABEL maintainer "Xiangmin Jiao <xmjiao@gmail.com>"
 USER root
 WORKDIR /tmp
 
+# Install compilers, openmpi, motif and mesa to prepare for Overture
 # Also install Atom for editing
 RUN add-apt-repository ppa:webupd8team/atom && \
     apt-get update && \
@@ -46,18 +47,20 @@ ENV APlusPlus=$AXX_PREFIX/A++/install \
     MOTIF=/usr \
     HDF=/usr/local/hdf5-${HDF5_VERSION} \
     Overture=$DOCKER_HOME/overture/Overture.bin \
-    LAPACK=/usr/lib
+    LAPACK=/usr/lib \
+    PETSC_ARCH=x86_64-linux-gnu-real \
+    PETSC_LIB=/usr/lib/x86_64-linux-gnu
 
 # Compile Overture framework
 RUN cd $DOCKER_HOME && \
-    git clone --depth 1 -b next https://github.com/unifem/overtureframework.git overture && \
-    perl -e 's/https:\/\/github.com\//git\@github.com:/g' -p -i $DOCKER_HOME/overture/.git/config && \
+    git clone --depth 1 https://github.com/unifem/overtureframework.git overture && \
+    perl -e 's/https:\/\/github.com\//git@github.com:/g' -p -i $DOCKER_HOME/overture/.git/config && \
     \
     mkdir $DOCKER_HOME/cad && \
     cd overture/Overture && \
     OvertureBuild=$Overture ./buildOverture && \
     cd $Overture && \
-    ./configure opt linux && \
+    ./configure opt linux petsc && \
     make -j2 && \
     make rapsodi
 
@@ -67,8 +70,8 @@ ENV CGBUILDPREFIX=$DOCKER_HOME/overture/cg.bin
 RUN cd $DOCKER_HOME/overture && \
     \
     cd $CG && \
-    make -j2 usePETSc=off libCommon && \
-    make -j2 usePETSc=off cgad cgcns cgins cgasf cgsm cgmp && \
+    make -j2 usePETSc=on OV_USE_PETSC_3=1 libCommon && \
+    make -j2 usePETSc=on OV_USE_PETSC_3=1 cgad cgcns cgins cgasf cgsm cgmp && \
     mkdir -p $CGBUILDPREFIX/bin && \
     ln -s -f $CGBUILDPREFIX/*/bin/* $CGBUILDPREFIX/bin
 
