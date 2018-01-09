@@ -49,13 +49,12 @@ ENV APlusPlus=$AXX_PREFIX/A++/install \
     Overture=$DOCKER_HOME/overture/Overture.bin \
     LAPACK=/usr/lib \
     PETSC_DIR=/usr/local/petsc-$PETSC_VERSION \
-    PETSC_ARCH=linux-gnu-opt \
     PETSC_LIB=/usr/local/petsc-$PETSC_VERSION/lib
 
 # Compile Overture framework
 RUN cd $DOCKER_HOME && \
-    git clone --depth 1 https://github.com/unifem/overtureframework.git overture && \
-    perl -e 's/https:\/\/github.com\//git@github.com:/g' -p -i $DOCKER_HOME/overture/.git/config && \
+    git clone --depth 1 -b next https://github.com/unifem/overtureframework.git overture && \
+    perl -e 's/https:\/\/github.com\//git\@github.com:/g' -p -i $DOCKER_HOME/overture/.git/config && \
     \
     mkdir $DOCKER_HOME/cad && \
     cd overture/Overture && \
