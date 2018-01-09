@@ -77,7 +77,7 @@ RUN cd /tmp && \
     cd petsc-${PETSC_VERSION} && \
     unset PETSC_DIR && \
     ./configure --prefix=/usr/local/petsc-${PETSC_VERSION} --with-mpi=0 \
-           PETSC_ARCH=linux-gnu-opt --with-debugging=0 --with-fortran=0 && \
+           --with-debugging=0 --with-fortran=0 --download-superlu  && \
     make MAKE_NP=2 && \
     sudo make install && \
     make PETSC_DIR=/usr/local/petsc-3.8.3 PETSC_ARCH="" test && \
