@@ -1,5 +1,5 @@
 # Builds a Docker image for the base of Overture in a Desktop environment
-# with Ubuntu and LXDE in serial without PETSc.
+# with Ubuntu and LXDE in serial with PETSc.
 #
 # The built image can be found at:
 #   https://hub.docker.com/r/unifem/overture-desktop
@@ -25,6 +25,7 @@ RUN apt-get update && \
       gfortran \
       openmpi-bin \
       libopenmpi-dev \
+      libopenblas-dev \
       \
       libmotif-dev \
       libgl1-mesa-dev \
@@ -66,6 +67,19 @@ RUN cd /tmp && \
     ./configure --enable-shared --enable-parallel --prefix /usr/local/hdf5-${HDF5_VERSION}-openmpi && \
     make -j2 && make install && \
     \
+    rm -rf /tmp/*
+
+ENV PETSC_VERSION=3.8.3
+# Build PETSc in serial
+RUN cd /tmp && \
+    curl -L http://ftp.mcs.anl.gov/pub/petsc/release-snapshots/petsc-lite-${PETSC_VERSION}.tar.gz | \
+        tar zx && \
+    cd petsc-${PETSC_VERSION} && \
+    ./configure --prefix=/usr/local/petsc-${PETSC_VERSION} --with-mpi=0 \
+           PETSC_ARCH=linux-gnu-opt --with-debugging=0 --with-fortran=0 && \
+    make MAKE_NP=2 && \
+    sudo make install && \
+    make PETSC_DIR=/usr/local/petsc-3.8.3 PETSC_ARCH="" test && \
     rm -rf /tmp/*
 
 USER $DOCKER_USER
