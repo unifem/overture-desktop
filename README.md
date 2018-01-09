@@ -1,8 +1,8 @@
 ## Docker Image for Overture in a Desktop Environment
 
-This Docker image is for learning and trying Overture for solving numerical PDEs.
+This Docker image is for learning and trying Overture for solving numerical PDEs. This particular branch contains the prebuilt version of the overture/overture framework.
 
-[![Build Status](https://travis-ci.org/unifem/overture-desktop.svg?branch=master)](https://travis-ci.org/unifem/overture-desktop)  [![Docker Image](https://images.microbadger.com/badges/image/unifem/overture-desktop.svg)](https://microbadger.com/images/unifem/overture-desktop)
+[![Build Status](https://travis-ci.org/unifem/overture-desktop.svg?branch=framework)](https://travis-ci.org/unifem/overture-desktop)  [![Docker Image](https://images.microbadger.com/badges/image/unifem/overture-desktop:framework.svg)](https://microbadger.com/images/unifem/overture-desktop)
 
 ### About [Overture](http://overtureframework.org/)
 
