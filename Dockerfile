@@ -75,6 +75,7 @@ RUN cd /tmp && \
     curl -L http://ftp.mcs.anl.gov/pub/petsc/release-snapshots/petsc-lite-${PETSC_VERSION}.tar.gz | \
         tar zx && \
     cd petsc-${PETSC_VERSION} && \
+    unset PETSC_DIR && \
     ./configure --prefix=/usr/local/petsc-${PETSC_VERSION} --with-mpi=0 \
            PETSC_ARCH=linux-gnu-opt --with-debugging=0 --with-fortran=0 && \
     make MAKE_NP=2 && \
