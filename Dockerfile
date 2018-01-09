@@ -1,7 +1,7 @@
 # Builds a Docker image for Overture from github in a Desktop environment
 # with Ubuntu and LXDE in parallel with PETSc 3.7.x.
 #
-# The built image can be found at:
+# The image can be found at:
 #   https://hub.docker.com/r/unifem/overture-desktop
 #
 # Authors:
@@ -33,7 +33,7 @@ RUN cd $DOCKER_HOME && \
     cd $DOCKER_HOME/overture/Overture && \
     OvertureBuild=$Overture ./buildOverture && \
     cd $Overture && \
-    ./configure opt linux parallel petsc cc=mpicc bcc=gcc CC=mpicxx bCC=g++ FC=mpif90 bFC=gfortran && \
+    ./configure opt linux parallel cc=mpicc bcc=gcc CC=mpicxx bCC=g++ FC=mpif90 bFC=gfortran && \
     make -j2 && \
     make rapsodi
 
