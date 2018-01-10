@@ -2,11 +2,11 @@ os: linux
 dist: trusty
 language: python
 services: docker
-sudo: required
+sudo: false
 
 env:
   global:
-    - BASE=unifem/overture-desktop:base TAG=petsc
+    - BASE=unifem/overture-desktop:framework TAG=parallel
 
 before_script:
   - docker --version
@@ -21,8 +21,6 @@ script:
         -z "$(git diff --name-only $TRAVIS_COMMIT_RANGE |
             grep -e Dockerfile -e .travis.yml -e image -e WELCOME)" ]] ||
     (docker build --tag unifem/overture-desktop:$TAG . &&
-     docker push unifem/overture-desktop &&
+     docker push unifem/overture-desktop:$TAG &&
      touch success)'
-  - 'docker build --tag unifem/overture-desktop:$TAG . && 
-     docker push unifem/overture-desktop'
   - docker images
