@@ -20,7 +20,7 @@ USER $DOCKER_USER
 ENV APlusPlus=$PXX_PREFIX/P++/install \
     PPlusPlus=$PXX_PREFIX/P++/install \
     HDF=/usr/local/hdf5-${HDF5_VERSION}-openmpi \
-    Overture=$DOCKER_HOME/overture/Overture.bin \
+    Overture=$DOCKER_HOME/overture/Overture.par \
     PETSC_DIR=/usr/lib/petscdir/3.7.6/x86_64-linux-gnu-real \
     PETSC_LIB=/usr/lib/x86_64-linux-gnu \
     CG=$DOCKER_HOME/overture/cg \
