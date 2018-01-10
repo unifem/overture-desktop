@@ -32,5 +32,8 @@ RUN cd $CG && \
     mkdir -p $CGBUILDPREFIX/bin && \
     ln -s -f $CGBUILDPREFIX/*/bin/* $CGBUILDPREFIX/bin
 
+RUN echo "export PATH=$CGBUILDPREFIX/bin:\$PATH:." >> \
+        $DOCKER_HOME/.profile
+
 USER root
 WORKDIR $DOCKER_HOME
