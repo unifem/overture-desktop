@@ -44,8 +44,6 @@ RUN cd $DOCKER_HOME && \
     make rapsodi && \
     \
     echo "export PATH=$Overture/bin:\$PATH:." >> \
-        $DOCKER_HOME/.profile && \
-    echo "export LD_LIBRARY_PATH=$APlusPlus/lib:$Overture/lib:\$LD_LIBRARY_PATH" >> \
         $DOCKER_HOME/.profile
 
 # Compile Overture framework in parallel

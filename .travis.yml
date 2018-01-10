@@ -2,7 +2,7 @@ os: linux
 dist: trusty
 language: python
 services: docker
-sudo: true
+sudo: false
 
 env:
   global:
@@ -14,6 +14,8 @@ before_script:
   - docker pull $BASE
 
 script:
+  # Build only if the BASE image is newer than the last commit,
+  # or the commit range of a push contains Dockerfile or .travis.yml
   - '[[ -n $(git log --since $(docker inspect $BASE | grep Created |
              perl -e "s/.+\"([\d-:T]+).+$/\$1/g" -p)) &&
        "$TRAVIS_EVENT_TYPE" == "push" && -n "$TRAVIS_COMMIT_RANGE" &&
