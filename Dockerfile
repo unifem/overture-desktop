@@ -17,7 +17,7 @@ LABEL maintainer "Xiangmin Jiao <xmjiao@gmail.com>"
 USER root
 WORKDIR /tmp
 
-# Install compilers, openmpi, motif and mesa to prepare for overture
+# Install compilers, openmpi, motif and mesa to prepare for Overture
 RUN apt-get update && \
     apt-get install -y --no-install-recommends \
       csh \
