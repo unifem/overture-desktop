@@ -30,4 +30,28 @@ RUN cd $CG && \
         $DOCKER_HOME/.profile
 
 USER root
+WORKDIR /tmp
+
+# Install Atom for editing
+RUN add-apt-repository ppa:webupd8team/atom && \
+    apt-get update && \
+    apt-get install -y --no-install-recommends \
+      atom && \
+    \
+    pip install -U autopep8 && \
+    apm install \
+        language-docker \
+        autocomplete-python \
+        git-plus \
+        merge-conflicts \
+        split-diff \
+        platformio-ide-terminal \
+        intentions \
+        busy-signal \
+        python-autopep8 \
+        clang-format && \
+    chown -R $DOCKER_USER:$DOCKER_GROUP $DOCKER_HOME && \
+    \
+    rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+
 WORKDIR $DOCKER_HOME
