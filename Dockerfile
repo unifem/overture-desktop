@@ -18,13 +18,15 @@ USER root
 WORKDIR /tmp
 
 USER $DOCKER_USER
-ENV APlusPlus=$AXX_PREFIX/A++/install \
-    XLIBS=/usr/lib/X11 \
+
+ENV XLIBS=/usr/lib/X11 \
     OpenGL=/usr \
     MOTIF=/usr \
+    LAPACK=/usr/lib \
+    \
+    APlusPlus=$AXX_PREFIX/A++/install \
     HDF=/usr/local/hdf5-${HDF5_VERSION} \
     Overture=$DOCKER_HOME/overture/Overture.bin \
-    LAPACK=/usr/lib \
     PETSC_DIR=/usr/local/petsc-$PETSC_VERSION \
     PETSC_LIB=/usr/local/petsc-$PETSC_VERSION/lib
 
@@ -45,6 +47,21 @@ RUN cd $DOCKER_HOME && \
         $DOCKER_HOME/.profile && \
     echo "export LD_LIBRARY_PATH=$APlusPlus/lib:$Overture/lib:\$LD_LIBRARY_PATH" >> \
         $DOCKER_HOME/.profile
+
+# Compile Overture framework in parallel
+RUN export APlusPlus=$PXX_PREFIX/A++/install && \
+    export PPlusPlus=$PXX_PREFIX/P++/install && \
+    export HDF=/usr/local/hdf5-${HDF5_VERSION}-openmpi && \
+    export Overture=$DOCKER_HOME/overture/Overture.par && \
+    export PETSC_DIR=/usr/lib/petscdir/3.7.6/x86_64-linux-gnu-real && \
+    export PETSC_LIB=/usr/lib/x86_64-linux-gnu && \
+    \
+    cd overture/Overture && \
+    OvertureBuild=$Overture ./buildOverture && \
+    cd $Overture && \
+    ./configure opt linux petsc parallel cc=mpicc bcc=gcc CC=mpicxx bCC=g++ FC=mpif90 bFC=gfortran && \
+    make -j2 && \
+    make rapsodi
 
 WORKDIR $DOCKER_HOME
 USER root
