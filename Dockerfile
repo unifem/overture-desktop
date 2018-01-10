@@ -56,7 +56,7 @@ RUN export APlusPlus=$PXX_PREFIX/A++/install && \
     export PETSC_DIR=/usr/lib/petscdir/3.7.6/x86_64-linux-gnu-real && \
     export PETSC_LIB=/usr/lib/x86_64-linux-gnu && \
     \
-    cd overture/Overture && \
+    cd $DOCKER_HOME/overture/Overture && \
     OvertureBuild=$Overture ./buildOverture && \
     cd $Overture && \
     ./configure opt linux petsc parallel cc=mpicc bcc=gcc CC=mpicxx bCC=g++ FC=mpif90 bFC=gfortran && \
