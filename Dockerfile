@@ -10,7 +10,6 @@
 # The installation procedure follows the (somewhat-oudated) Guide at
 # See http://www.overtureframework.org/documentation/install.pdf
 
-# Use meshdb-desktop as base image
 FROM unifem/overture-desktop:base
 LABEL maintainer "Xiangmin Jiao <xmjiao@gmail.com>"
 
@@ -32,7 +31,7 @@ ENV XLIBS=/usr/lib/X11 \
 
 # Compile Overture framework in serial
 RUN cd $DOCKER_HOME && \
-    git clone https://github.com/unifem/overtureframework.git overture && \
+    git clone -b next https://github.com/unifem/overtureframework.git overture && \
     perl -e 's/https:\/\/github.com\//git\@github.com:/g' -p -i $DOCKER_HOME/overture/.git/config && \
     \
     mkdir $DOCKER_HOME/cad && \
