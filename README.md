@@ -1,4 +1,4 @@
-## Docker Image for Overture in a Desktop Environment
+## Base Docker Image for Overture in a Desktop Environment
 
 This Docker image is for learning and trying Overture for solving numerical PDEs.
 
