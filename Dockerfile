@@ -31,11 +31,12 @@ ENV XLIBS=/usr/lib/X11 \
 
 # Compile Overture framework in serial
 RUN cd $DOCKER_HOME && \
+    mkdir $DOCKER_HOME/cad && \
     git clone -b next https://github.com/unifem/overtureframework.git overture && \
     perl -e 's/https:\/\/github.com\//git\@github.com:/g' -p -i $DOCKER_HOME/overture/.git/config && \
     \
-    mkdir $DOCKER_HOME/cad && \
     cd overture/Overture && \
+    git remote add https https://github.com/unifem/overtureframework.git && \
     OvertureBuild=$Overture ./buildOverture && \
     cd $Overture && \
     ./configure opt linux petsc && \
