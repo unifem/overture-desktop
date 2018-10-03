@@ -1,4 +1,5 @@
 os: linux
+sudo: required
 language: python
 services: docker
 
@@ -6,5 +7,7 @@ before_script:
   - git clone --depth=1 https://$GIT_TOKEN@github.com/xmjiao/ci-util.git
 
 script:
-  - './ci-util/build-docker.sh &&
-    ./ci-util/trigger-via-api.sh'
+  - ./ci-util/build-docker.sh
+
+after_success:
+  - ./ci-util/trigger-via-api.sh
