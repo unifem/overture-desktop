@@ -1,5 +1,5 @@
 # Builds a Docker image for Overture from github in a Desktop environment
-# with Ubuntu and LXDE in serial with PETSc 3.8.x.
+# with Ubuntu and LXDE in serial with PETSc 3.8 and in parallel with PETSc 3.7
 #
 # The built image can be found at:
 #   https://hub.docker.com/r/unifem/overture-desktop
@@ -51,8 +51,8 @@ RUN export APlusPlus=$PXX_PREFIX/P++/install && \
     export PPlusPlus=$PXX_PREFIX/P++/install && \
     export HDF=/usr/local/hdf5-${HDF5_VERSION}-openmpi && \
     export Overture=$DOCKER_HOME/overture/Overture.par && \
-    export PETSC_DIR=/usr/local/petsc-$PETSC_VERSION && \
-    export PETSC_LIB=/usr/local/petsc-$PETSC_VERSION/lib && \
+    export PETSC_DIR=/usr/lib/petscdir/3.7 && \
+    export PETSC_LIB=/usr/lib/x86_64-linux-gnu && \
     \
     cd $DOCKER_HOME/overture/Overture && \
     OvertureBuild=$Overture ./buildOverture && \
