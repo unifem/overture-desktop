@@ -51,8 +51,8 @@ RUN export APlusPlus=$PXX_PREFIX/P++/install && \
     export PPlusPlus=$PXX_PREFIX/P++/install && \
     export HDF=/usr/local/hdf5-${HDF5_VERSION}-openmpi && \
     export Overture=$DOCKER_HOME/overture/Overture.par && \
-    export PETSC_DIR=/usr/lib/petscdir/3.7.6/x86_64-linux-gnu-real && \
-    export PETSC_LIB=/usr/lib/x86_64-linux-gnu && \
+    export PETSC_DIR=/usr/local/petsc-$PETSC_VERSION && \
+    export PETSC_LIB=/usr/local/petsc-$PETSC_VERSION/lib && \
     \
     cd $DOCKER_HOME/overture/Overture && \
     OvertureBuild=$Overture ./buildOverture && \
