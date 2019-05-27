@@ -80,7 +80,7 @@ RUN cd /tmp && \
            --with-debugging=0 --with-fortran=0 --download-superlu  && \
     make MAKE_NP=2 && \
     sudo make install && \
-    make PETSC_DIR=/usr/local/petsc-3.8.3 PETSC_ARCH="" test && \
+    make PETSC_DIR=/usr/local/petsc-${PETSC_VERSION} PETSC_ARCH="" test && \
     rm -rf /tmp/*
 
 USER $DOCKER_USER
